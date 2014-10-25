@@ -26,15 +26,6 @@ module.exports = function(RED) {
             fadeTime: n.fadeTime,
         };
 
-        // this.state = {
-        //     on: !!n.on,
-        //     hue: 0xcc15,
-        //     saturation: 0xffff,
-        //     luminance: 0x8000,
-        //     whiteColor: 0,
-        //     fadeTime: 0x0513,
-        // };
-
         function setPower(state) {
             if(state) {
                 node.log("Lights on");
@@ -73,6 +64,12 @@ module.exports = function(RED) {
 
             setPower(this.state.on);
             setColor(this.state);
+
+            var out = {
+                topic: this.topic,
+                payload: this.state
+            };
+            this.send(out);
         });
 
         this.on('close', function() {
