@@ -12,6 +12,7 @@ module.exports = function(RED) {
             this.vlcPath = "vlc";
         }
         this.sound = config.sound;
+        this.repeats = config.repeats;
         
         console.log(config);
         var node = this;
@@ -26,7 +27,11 @@ module.exports = function(RED) {
                 }
                  console.log("Spawning " + this.vlcPath + " sound " + this.sound);
                   this.status({fill:"red",shape:"dot",text:"Playing"});
-                this.vlcHandle = spawn(this.vlcPath,[this.sound,"-R"]);
+                  var options = [this.sound];
+                  if(this.repeats){
+                      options.push("-R");
+                  }
+                this.vlcHandle = spawn(this.vlcPath,options);
             }else{
                 
                 if(this.vlcHandle != null){

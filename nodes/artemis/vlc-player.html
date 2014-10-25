@@ -6,7 +6,8 @@
         defaults: {
             name: {value:""},
             sound: {value:""},
-            vlcPath: {value:""}
+            vlcPath: {value:""},
+            repeats: {value: false}
 
         },
         inputs:1,
@@ -30,6 +31,9 @@
     <div class="form-row">
         <label for="node-input-sound"><i class="icon-tag"></i> Sound path</label>
         <input type="text" id="node-input-sound" placeholder="Path to Sound">
+    </div>
+    <div class="form-row">
+        <input style="margin: 20px 0 20px 100px; width: 30px;" type="checkbox" id="node-input-repeats"><label style="width: 250px;" for="node-input-repeats">Repeats?</label>
     </div>
 </script>
 
