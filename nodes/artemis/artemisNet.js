@@ -5,7 +5,7 @@ var net = require('net');
 var fs  = require('fs');
 var reader = require('./artemisBufferReader').artemisBufferReader;
 // Server Address, will only be set if connected.
-var serverAddr = null;
+var _SERVER;
 
 // How many times to retry connecting to a server. 0 disables.
 var retries = 0;
@@ -35,6 +35,8 @@ function connect (server, r) {
 		retries = r;
 	}
 
+	_SERVER = server;
+
 	sock = net.connect(server, function(){
 		console.log('Connected to server.');
 		sock.on('data', onPacket);
@@ -43,7 +45,9 @@ function connect (server, r) {
 	}).on('error', function(){
 		if (retries >= 0) {
 			console.error('Trying to reconnect, ' + retries + ' attempts left');
-			setTimeout( function(){connect(server,retries-1)}, 1000);
+			setTimeout( function(){
+				connect(server,retries-1);
+			}, 1000);
 		} else {
 			console.error('Connection refused');
 			fireEvents('disconnected');
@@ -51,7 +55,7 @@ function connect (server, r) {
 	});
 }
 
-function disconnect (server, r) {
+function disconnect () {
 	retries = 0;
 	if (sock) {
 		sock.end();
@@ -285,7 +289,9 @@ function onDisconnect(){
 	fireEvents('disconnected');
 	if (retries) {
 		console.error('Trying to reconnect');
-		setTimeout(function(){connect(serverAddr,retries-1)}, 1000);
+		setTimeout(function(){
+			connect(_SERVER,retries-1);
+		}, 1000);
 	}
 }
 
