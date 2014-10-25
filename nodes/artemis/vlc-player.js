@@ -25,9 +25,11 @@ module.exports = function(RED) {
                     this.vlcHandle = null;
                 }
                  console.log("Spawning " + this.vlcPath + " sound " + this.sound);
+                  this.status({fill:"red",shape:"dot",text:"Playing"});
                 this.vlcHandle = spawn(this.vlcPath,[this.sound,"-R"]);
             }else{
                 console.log("Killing");
+                this.status({fill:"green",shape:"dot",text:"Stopped"});
                 this.vlcHandle.kill('SIGKILL');
                 this.vlcHandle = null;
             }
