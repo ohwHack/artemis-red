@@ -1,0 +1,38 @@
+<script type="text/javascript">
+    RED.nodes.registerType('vlc-player',{
+        category: 'function',
+        color: '#a6bbcf',
+
+        defaults: {
+            name: {value:""},
+            sound: {value:""},
+            vlcPath: {value:""}
+
+        },
+        inputs:1,
+        outputs:1,
+        icon: "feed.png",
+        label: function() {
+            return this.name||"vlc-player";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="vlc-player">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-vlcPath"><i class="icon-tag"></i> VLC Path</label>
+        <input type="text" id="node-input-vlcPath" placeholder="Path to VLC">
+    </div>
+    <div class="form-row">
+        <label for="node-input-sound"><i class="icon-tag"></i> Sound path</label>
+        <input type="text" id="node-input-sound" placeholder="Path to Sound">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="vlc-player">
+    <p>A simple node that converts the message payloads into all lower-case characters</p>
+</script>
