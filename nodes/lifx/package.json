@@ -8,6 +8,7 @@
   },
   "author": "",
   "dependencies": {
-    "lifx": "^0.2.1"
+    "lifx": "^0.1.3",
+    "merge": "^1.2.0"
   }
 }
