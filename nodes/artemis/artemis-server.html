@@ -1,0 +1,23 @@
+<script type="text/javascript">
+    RED.nodes.registerType('artemis-server',{
+        category: 'config',
+        defaults: {
+            host: {value:'localhost',required:true},
+            port: {value:2010,required:true,validate:RED.validators.number()},
+        },
+        label: function() {
+            return this.host+":"+this.port;
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="artemis-server">
+    <div class="form-row">
+        <label for="node-config-input-host"><i class="fa fa-globe"></i> Host</label>
+        <input type="text" id="node-config-input-host">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-port"><i class="fa fa-asterisk"></i> Port</label>
+        <input type="text" id="node-config-input-port">
+    </div>
+</script>
