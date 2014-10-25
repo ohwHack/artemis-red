@@ -1,3 +1,11 @@
+##spinani mlhovace
+http://pastebin.com/0U45WhZW
+https://www.youtube.com/watch?v=u0nANA8uRgs
+##HW
+http://www.ebay.com/itm/371082057375
+http://www.ebay.com/itm/301225602915
+http://www.ebay.com/itm/121351647349
+
 # Node-RED
 
 http://nodered.org
