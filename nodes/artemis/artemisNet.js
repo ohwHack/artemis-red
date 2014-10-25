@@ -27,24 +27,23 @@ var eventHandlers = {
 // Connect to the server.
 // Params: server address (string) and whether to retry connections to this
 //   server (boolean)
-function connect (addr, r) {
-	
-	console.log('Connecting to server: ', addr);
-	
+function connect (server, r) {
+
+	console.log('Connecting to server: ', server.host, ':', server.port);
+
 	if (r !== null) {
 		retries = r;
 	}
-	serverAddr = addr;
-	
-	sock = net.connect({host: addr, port:2010}, function(){
-		console.log('Connected to server: ', addr);
+
+	sock = net.connect(server, function(){
+		console.log('Connected to server.');
 		sock.on('data', onPacket);
 		sock.on('end', onDisconnect);
 		fireEvents('connected');
 	}).on('error', function(){
 		if (retries >= 0) {
 			console.error('Trying to reconnect, ' + retries + ' attempts left');
-			setTimeout(function(){connect(serverAddr,retries-1)}, 1000);
+			setTimeout( function(){connect(server,retries-1)}, 1000);
 		} else {
 			console.error('Connection refused');
 			fireEvents('disconnected');
@@ -52,7 +51,7 @@ function connect (addr, r) {
 	});
 }
 
-function disconnect (addr, r) {
+function disconnect (server, r) {
 	retries = 0;
 	if (sock) {
 		sock.end();
@@ -61,9 +60,9 @@ function disconnect (addr, r) {
 
 
 // Aux function to fire all event handlers of the given event.
-// The event handler will be passed 'data', a generic object 
+// The event handler will be passed 'data', a generic object
 //   containing the human-readable contents of the packet.
-// In the special case of the 'packet' event, a 'packetType' 
+// In the special case of the 'packet' event, a 'packetType'
 //   is added to the struct.
 function fireEvents(eventType, data, packetType) {
 	for (var i in eventHandlers[eventType]) {
@@ -96,20 +95,20 @@ var previousBuffer = null;
 //   parsing depending on the packet type.
 function onPacket(buffer) {
 	var header = {};
-	
+
 	if (previousBuffer) {
 		buffer = Buffer.concat([previousBuffer, buffer]);
 // 		console.log('Concatenating previously received data, now is ',buffer);
 		previousBuffer = null;
 	}
 	var data = new reader(buffer);
-	
+
 	if (buffer.length < 24) {
 // 		console.log('End of TCP datagram reached while parsing packet headers');
 		previousBuffer = buffer;
 		return;
 	}
-	
+
 	header.magic          = data.readLong();
 	header.packetLength   = data.readLong();
 	header.origin         = data.readLong();
@@ -117,9 +116,9 @@ function onPacket(buffer) {
 	header.bytesRemaining = data.readLong();
 	header.type           = data.readLong();
 	header.subtype        = null;
-	
+
 // 	console.log(header);
-	
+
 	if (header.magic != 0xdeadbeef) {
 		console.error('Bad magic number!!', header.magic);
 // 		console.log(buffer);
@@ -129,13 +128,13 @@ function onPacket(buffer) {
 		console.error('Packet length and remaining bytes mismatch!!');
 		return;
 	}
-	
+
 	if (buffer.length < header.packetLength) {
 // 		console.log('End of TCP datagram before end of packet');
 		previousBuffer = buffer;
 		return;
 	}
-	
+
 	var packetDef = null;
 	if (knownPackets.hasOwnProperty( header.type )) {
 		var packets = [];
@@ -145,7 +144,7 @@ function onPacket(buffer) {
 		if (knownPackets[header.type].subpackets) {
 			subtypeLength = knownPackets[header.type].subtypeLength;
 		}
-		
+
 		// One packet may contain several subpackets, just concatenated.
 		while(data.pointer < header.packetLength)
 		{
@@ -162,7 +161,7 @@ function onPacket(buffer) {
 // 					console.log('End of subpackets');
 					break;
 				}
-				
+
 				if ( knownSubPackets[header.type].hasOwnProperty(header.subtype)) {
 					packetDef = knownSubPackets[header.type][header.subtype];
 				}
@@ -175,7 +174,7 @@ function onPacket(buffer) {
 				console.error('Unknown packet!', header.type, header.subtype);
 			}
 
-					
+
 			// Unfortunately, there might be some bugs still present
 			//   with random crashes involving reading outside the
 			//   recv buffer, so let's wrap this into a try-catch...
@@ -183,7 +182,7 @@ function onPacket(buffer) {
 				packetTypes.push(packetType);
 				var unpacked = packetDef.unpack(data);
 				packets.push(unpacked);
-				
+
 				// Debug: log non-entity-update packets
 				if (header.type != 0x80803df9 &&
 				    packetType != 'togglePause' &&
@@ -198,7 +197,7 @@ function onPacket(buffer) {
 				    packetType != 'destroyObject') {
 					console.log(packetType, unpacked);
 				}
-				
+
 			} catch(e) {
 				console.error('Aaaaiiieeeee, something went wrong while parsing a packet of type ' + packetType + '!');
 				var str = '';
@@ -214,7 +213,7 @@ function onPacket(buffer) {
 				break;
 			}
 		}
-		
+
 		// Some packets, particularly the stationUpdate one,
 		//  may return more than one payload.
 // 		if (Array.isArray(packet)) {
@@ -223,20 +222,20 @@ function onPacket(buffer) {
 			fireEvents(packetTypes[i], packets[i]);
 			fireEvents('packet', packets[i], packetTypes[i]);
 		}
-		
-		
+
+
 		// Packets with 1-byte subtype are packed to 4 bytes.
 		// This means the last 00 is really the last 00000000 and
 		//   we need to advance the pointer a little bit.
 		if (subtypeLength == 1) {
 			data.pointer+=3;
 		}
-		
+
 		// Code to debug unknown/weird/mishandled packets
 		if (data.pointer != header.packetLength) {
 			console.log('Mismatching read length and packet length: ', data.pointer, header.packetLength, ' , data size: ', data.buffer.length);
 			console.log('Last packet was: ', packetTypes[packets.length-1], packets[packets.length-1]);
-			
+
 			var str = '';
 			for (var i = 0; i<data.pointer && i<data.buffer.length; i++) {
 				var hex = data.buffer.readUInt8(i).toString(16);
@@ -247,7 +246,7 @@ function onPacket(buffer) {
 			}
 			console.log('Data was:');
 			console.log(str);
-			
+
 			var str = '';
 			for (var i = data.pointer; i<=header.packetLength && i<data.buffer.length; i++) {
 				var hex = data.buffer.readUInt8(i).toString(16);
@@ -261,7 +260,7 @@ function onPacket(buffer) {
 		}
 	} else {
 		console.error('Unknown packet type: ', header.type.toString(16), ', subtype: ', header.subtype);
-		
+
 		// Display the unknown payload if it's not a magic word
 		//   marking the start of the next packet.
 		if (data.length) {
@@ -271,7 +270,7 @@ function onPacket(buffer) {
 		}
 		fireEvents('packet', header);
 	}
-	
+
 	// Perhaps we still have some data in the same TCP packet, so let's use a bit of recursivity...
 	if (data.buffer.length > header.packetLength) {
 		onPacket( data.buffer.slice(header.packetLength) );
@@ -301,7 +300,7 @@ function emit(packetName, data) {
 	if (!packet.pack) {
 		return false;
 	}
-	
+
 	// Declare a buffer big enough, and wrap it with our helpers.
 	var writer = new reader( new Buffer(2048) );	// Yes, yes, I know the naming doesn't make any sense.
 	writer.writeLong(0xdeadbeef);	// Magic number
@@ -310,21 +309,21 @@ function emit(packetName, data) {
 	writer.writeLong(0);	// Unknown
 	writer.writeLong(0);	/// bytesRemaining FIXME!!! Will need to re-write with real length
 	writer.writeLong( packet.type );
-	
+
 	if (packet.subtypeLength == 1) {
 		writer.writeByte( packet.subtype );
 	} else if (packet.subtypeLength == 4) {
 		writer.writeLong( packet.subtype );
 	}
-	
+
 	packet.pack( writer, data );
-	
+
 	// Re-write packetLength
 	writer.buffer.writeUInt32LE(writer.pointer, 4);
-	
+
 	// Re-write remainingBytes
 	writer.buffer.writeUInt32LE(writer.pointer - 20, 16);
-	
+
 	// Finally, send the useful part of the buffer.
 	sock.write( writer.buffer.slice(0,writer.pointer) );
 }
@@ -354,19 +353,19 @@ function registerPacketType( packet ) {
 			subpackets: true,
 		        subtypeLength: packet.subtypeLength
 		};
-		
+
 		if (!knownSubPackets.hasOwnProperty(packet.type)) {
 			knownSubPackets[ packet.type ] = {};
 		}
-		
-		knownSubPackets[ packet.type ][ packet.subtype ] = 
+
+		knownSubPackets[ packet.type ][ packet.subtype ] =
 			packet;
 	}
-	
+
 	if (!eventHandlers.hasOwnProperty(packet.name)) {
 		eventHandlers[ packet.name ] = [];
 	}
-	
+
 	packetsByName[ packet.name ] = packet;
 	/// TODO!!! Implement the translation of browser-side "emit"s to
 	///   glitter-side "emit"s.
@@ -377,13 +376,13 @@ function registerPacketType( packet ) {
 //   across two levels of subdirectories to make editing a bit saner.
 
 function recursiveRegisterPacket(dirname) {
-	
+
 	var packetFiles = fs.readdirSync(dirname);
-	
+
 	for (i in packetFiles) {
-		
+
 		var fullname = dirname + '/' + packetFiles[i];
-		
+
 		if (fs.statSync(fullname).isDirectory()) {
 			recursiveRegisterPacket(fullname);
 		} else {
