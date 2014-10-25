@@ -1,6 +1,6 @@
 node_modules
 credentials.json
-flows*.json
+/*flows*.json*/
 flows.backup
 *_cred*
 nodes/node-red-nodes/
