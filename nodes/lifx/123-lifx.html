@@ -43,6 +43,7 @@
 <!-- Next, some simple help text is provided for the node.                   -->
 <script type="text/x-red" data-help-name="lifx">
    <p>Set parameters for Lifx light bulb.</p>
+   <p>Returns current node state.</p>
    <p><b>msg.payload</b>. msg.payload is an Object.</p>
 </script>
 
@@ -64,7 +65,7 @@
         },
         color: "#FFFFFF",
         inputs:1,               // set the number of inputs - only 0 or 1
-        outputs:0,              // set the number of outputs - 0 to n
+        outputs:1,              // set the number of outputs - 0 to n
         // set the icon (held in icons dir below where you save the node)
         icon: "light.png",     // saved in  icons/myicon.png
         label: function() {     // sets the default label contents
