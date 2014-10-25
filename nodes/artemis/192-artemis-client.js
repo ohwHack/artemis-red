@@ -10,12 +10,17 @@ module.exports = function(RED) {
         this.server = RED.nodes.getNode(config.server);
         try {
             this.status({fill:"yellow", shape:"ring",text:"connecting"});
-            artemisNet.connect(this.server, 10);
-            RegisterNetMsgAndSend('playerUpdate',node);
-            RegisterNetMsgAndSend('damcon',node);
-            RegisterNetMsgAndSend('playerShipDamage',node);
-            RegisterNetMsgAndSend('gameOver',node);
-            this.status({fill:"green",shape:"dot",text:"connected"});
+            if(!this.server) {
+                node.warn("server configuration is empty");
+            }
+            else {
+                artemisNet.connect(this.server, 10);
+                RegisterNetMsgAndSend('playerUpdate',node);
+                RegisterNetMsgAndSend('damcon',node);
+                RegisterNetMsgAndSend('playerShipDamage',node);
+                RegisterNetMsgAndSend('gameOver',node);
+                this.status({fill:"green",shape:"dot",text:"connected"});
+            }
         }
         catch(e) {
             this.status({fill:"red", shape:"ring",text:"error"});
