@@ -2,7 +2,6 @@ module.exports = function(RED) {
     "use strict";
     var lifx = require('lifx');
     var merge = require('merge');
-    lifx.setDebug(false);
 
     // The main node definition - most things happen in here
     function LifxNode(n) {
@@ -16,16 +15,25 @@ module.exports = function(RED) {
         // Create a RED node
         RED.nodes.createNode(this, n);
 
-        // Store local copies of the node configuration (as defined in the .html)
-
+        lifx.setDebug(!!n.debug);
+        // Set default values from node configuration
         this.state = {
-            on: true,
-            hue: 0xcc15,
-            saturation: 0xffff,
-            luminance: 0x8000,
-            whiteColor: 0,
-            fadeTime: 0x0513,
+            on: !!n.on,
+            hue: n.hue,
+            saturation: n.saturation,
+            luminance: n.luminance,
+            whiteColor: n.whiteColor,
+            fadeTime: n.fadeTime,
         };
+
+        // this.state = {
+        //     on: !!n.on,
+        //     hue: 0xcc15,
+        //     saturation: 0xffff,
+        //     luminance: 0x8000,
+        //     whiteColor: 0,
+        //     fadeTime: 0x0513,
+        // };
 
         function setPower(state) {
             if(state) {
@@ -51,7 +59,8 @@ module.exports = function(RED) {
         }
 
 
-        setPower(true);
+        // send initial values
+        setPower(this.state.on);
         setColor(this.state);
 
         // respond to inputs....

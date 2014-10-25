@@ -18,7 +18,7 @@ module.exports = function(RED) {
         this.on('input', function(msg) {
             console.log("Vlc handle is: " + this.vlcHandle);
            
-            if(this.vlcHandle == null || msg.topic == "on"){
+            if((this.vlcHandle == null || msg.payload == "on") && msg.payload != "off"){
                 if(this.vlcHandle != null){
                     console.log("Killing");
                     this.vlcHandle.kill('SIGKILL');
@@ -28,9 +28,12 @@ module.exports = function(RED) {
                   this.status({fill:"red",shape:"dot",text:"Playing"});
                 this.vlcHandle = spawn(this.vlcPath,[this.sound,"-R"]);
             }else{
-                console.log("Killing");
-                this.status({fill:"green",shape:"dot",text:"Stopped"});
-                this.vlcHandle.kill('SIGKILL');
+                
+                if(this.vlcHandle != null){
+                    console.log("Killing");
+                    this.vlcHandle.kill('SIGKILL');
+                    this.vlcHandle = null;
+                }
                 this.vlcHandle = null;
             }
             
