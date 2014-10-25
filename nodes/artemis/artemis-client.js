@@ -3,15 +3,14 @@ module.exports = function(RED) {
         artemisModel = require('./public/javascripts/worldmodel');
 
     function ArtemisClient(config) {
-        RED.nodes.createNode(this,config);
+        RED.nodes.createNode(this, config);
         var node = this;
-
 
         this.status({fill:"red", shape:"ring",text:"disconnected"});
         this.server = RED.nodes.getNode(config.server);
         try {
             this.status({fill:"yellow", shape:"ring",text:"connecting"});
-            artemisNet.connect(server, 10);
+            artemisNet.connect(this.server, 10);
             RegisterNetMsgAndSend('playerUpdate',node);
             RegisterNetMsgAndSend('damcon',node);
             RegisterNetMsgAndSend('playerShipDamage',node);
