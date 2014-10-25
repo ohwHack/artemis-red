@@ -1,0 +1,41 @@
+<script type="text/x-red" data-template-name="lifx">
+    <div class="form-row">
+        <label for="node-input-topic"><i class="fa fa-tasks"></i> Topic</label>
+        <input type="text" id="node-input-topic" placeholder="Topic">
+    </div>
+
+    <br/>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+
+<!-- Next, some simple help text is provided for the node.                   -->
+<script type="text/x-red" data-help-name="sample">
+   <p>Lifx output node. You can set any number of parameters.</p>
+   <b>msg.payload</b>. msg.payload is an Object.</p>
+</script>
+
+<!-- Finally, the node type is registered along with all of its properties   -->
+<!-- The example below shows a small subset of the properties that can be set-->
+<script type="text/javascript">
+    RED.nodes.registerType('lifx',{
+        category: 'output',      // the palette category
+        defaults: {             // defines the editable properties of the node
+            name: {value:""},   //  along with default values.
+            topic: {value:"", required:true}
+        },
+        inputs:1,               // set the number of inputs - only 0 or 1
+        outputs:0,              // set the number of outputs - 0 to n
+        // set the icon (held in icons dir below where you save the node)
+        icon: "light.png",     // saved in  icons/myicon.png
+        label: function() {     // sets the default label contents
+            return this.name||this.topic||"lifx";
+        },
+        labelStyle: function() { // sets the class to apply to the label
+            return this.name?"node_label_italic":"";
+        }
+    });
+</script>
