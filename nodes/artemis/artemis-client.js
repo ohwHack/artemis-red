@@ -7,7 +7,7 @@ module.exports = function(RED) {
 
     function ArtemisClient(config) {
         RED.nodes.createNode(this,config);
-        artemisNet.connect("192.168.26.107", 10);
+        artemisNet.connect("192.168.0.107", 10);
         this.status({fill:"green",shape:"dot",text:"connected"});
         var node = this;
         this.on('input', function(msg) {
