@@ -4,11 +4,10 @@
         color: '#a6bbcf',
 
         defaults: {
-            name: {value:""}
-
-
+            name: {value:""},
+            server: {value:"", type:"artemis-server"},
         },
-        inputs:1,
+        inputs:0,
         outputs:1,
         icon: "bridge.png",
         label: function() {
@@ -18,6 +17,10 @@
 </script>
 
 <script type="text/x-red" data-template-name="artemis-client">
+    <div class="form-row">
+        <label for="node-input-server"><i class="fa fa-globe"></i> Server</label>
+        <input id="node-input-server">
+    </div>
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">

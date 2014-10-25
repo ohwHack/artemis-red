@@ -25,12 +25,17 @@ module.exports = function(RED) {
                     this.vlcHandle.kill('SIGKILL');
                     this.vlcHandle = null;
                 }
-                 console.log("Spawning " + this.vlcPath + " sound " + this.sound);
+                 
                   this.status({fill:"red",shape:"dot",text:"Playing"});
-                  var options = [this.sound];
+                  var options = [this.sound,"-I rc"];
                   if(this.repeats){
                       options.push("-R");
+                  }else{
+                      options.push("--ignore-config");
+                      //options.push("--play-and-stop");
+                      options.push("--play-and-exit");
                   }
+                  console.log("Spawning " + this.vlcPath + " sound " + options) ;
                 this.vlcHandle = spawn(this.vlcPath,options);
             }else{
                 
