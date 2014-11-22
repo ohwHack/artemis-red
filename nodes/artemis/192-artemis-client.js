@@ -1,7 +1,7 @@
 module.exports = function(RED) {
     var artemisNet = require('./artemisNet'),
         artemisModel = require('./public/javascripts/worldmodel');
-
+    var registeredEvents = ['playerUpdate', 'damcon', 'playerShipDamage', 'gameOver', 'gameRestart', 'beamFired', 'togglePause'];
     function ArtemisClient(config) {
         RED.nodes.createNode(this, config);
         var node = this;
@@ -15,10 +15,9 @@ module.exports = function(RED) {
             }
             else {
                 artemisNet.connect(this.server, 10);
-                RegisterNetMsgAndSend('playerUpdate',node);
-                RegisterNetMsgAndSend('damcon',node);
-                RegisterNetMsgAndSend('playerShipDamage',node);
-                RegisterNetMsgAndSend('gameOver',node);
+                registeredEvents.forEach(function(topic) {
+                    RegisterNetMsgAndSend(topic,node);
+                });
                 this.status({fill:"green",shape:"dot",text:"connected"});
             }
         }
